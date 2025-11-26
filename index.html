@@ -51,7 +51,6 @@ function loadOBJ(objPath) {
         objLoader.setMaterials(materials);
         objLoader.load(objPath, object => {
             currentModel = object;
-            // center
             const box = new THREE.Box3().setFromObject(currentModel);
             const center = box.getCenter(new THREE.Vector3());
             currentModel.position.sub(center);
@@ -72,8 +71,8 @@ function animate() {
 }
 animate();
 
-window.addEventListener('resize',()=>{
-    camera.aspect = window.innerWidth/window.innerHeight;
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
