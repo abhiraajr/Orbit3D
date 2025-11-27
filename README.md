@@ -101,6 +101,7 @@ main (branch)
 ├─ airplane.obj
 ├─ alienspaceship.glb
 ├─ floatplane.obj
+├─ LICENSE
 └─ README.md
 ```
 
