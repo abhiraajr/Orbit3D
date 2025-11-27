@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>3D Viewer with Controls</title>
+<title>3D Viewer</title>
 <style>
 html, body {
   margin: 0;
@@ -52,17 +52,31 @@ html, body {
   border-radius: 15px;
   border: 2px solid var(--border-color);
   background: #000;
-  color: #fff;
+  color: white;
   font-size: 0.85em;
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  width: 389px;       /* or whatever fixed width you want */
+  box-sizing: border-box; /* ensures padding/border is inside this size */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical centering */
   gap: 12px;
 }
 
 /* Panel stacking with uniform gap */
 #menu { top: 20px; right: 20px; flex-direction: row; gap: 10px; }
-#controls { top: calc(20px + 60px + var(--panel-gap)); right: 20px; }
-#zoomReminder { top: calc(20px + 60px + 186px + 2 * var(--panel-gap)); right: 20px; }
+#controls {
+  top: calc(20px + 60px + var(--panel-gap));
+  right: 20px;
+}
+#zoomReminder {
+  top: calc(20px + 60px + 186px + 2 * var(--panel-gap));
+  right: 20px;
+  white-space: normal;   /* allow text to wrap */
+  overflow-wrap: break-word; /* force breaks on long words if needed */
+}
 
 /* Menu buttons */
 .menu-button {
