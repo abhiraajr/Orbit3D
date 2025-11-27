@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>3D Viewer</title>
+<title>Orbit3D | A 3D Model Viewer</title>
 <style>
 html, body {
   margin: 0;
@@ -67,22 +67,38 @@ html, body {
 
 /* Panel stacking with uniform gap */
 #menu {
+  position: absolute;
   top: 20px;
   right: 20px;
-  justify-content: flex-start !important;
-  align-items: center !important;
-  padding-left: 0 !important;
+
+  /* OVERRIDE all inherited panel styles */
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  border-radius: 15px;
+  border: 2px solid var(--border-color);
+  background: #000;
+
+  /* Layout */
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 12px;            /* spacing between buttons */
+  padding-left: 12px;   /* spacing from left border */
+  padding-right: 12px;  /* spacing from right border */
+  height: 60px;         /* clean consistent bar height */
+
+  /* Scrolling */
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
-  scroll-behavior: smooth;
-  scrollbar-width: none;        /* Firefox */
+  scrollbar-width: none;
 }
+
 #menu::-webkit-scrollbar {
-  display: none;                /* Chrome/Safari */
+  display: none;
 }
 #controls {
   top: calc(20px + 60px + var(--panel-gap));
@@ -153,6 +169,33 @@ html, body {
   #zoomReminder { top: 200px; }
   .menu-button { padding: 6px 10px; font-size: 0.85em; }
 }
+
+#footer {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #9bbcff;
+  background: #000;
+  border: 1px solid #1565c0;
+  border-radius: 8px;
+  opacity: 0.85;
+  z-index: 50;
+  user-select: none;
+  pointer-events: none; /* footer itself doesn't block interactions */
+}
+
+#footer a {
+  color: #5ea0ff;        /* brighter blue for link */
+  text-decoration: none;
+  font-weight: bold;
+  pointer-events: auto;  /* ONLY the link is clickable */
+}
+
+#footer a:hover {
+  text-decoration: underline;
+}
 </style>
 </head>
 <body>
@@ -190,6 +233,11 @@ html, body {
 <!-- Zoom reminder panel -->
 <div id="zoomReminder" class="panel">
   Tip: Use your mouse scroll or touchpad to zoom out and adjust the 3D view.
+</div>
+
+<div id="footer">
+  <a href="https://github.com/abhiraajr/Orbit3D" target="_blank" id="footer-link">Orbit3D</a>
+  © 2025 abhiraajr | Powered by 3DViewer.net
 </div>
 
 <script>
