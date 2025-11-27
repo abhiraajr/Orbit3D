@@ -57,11 +57,11 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 389px;       /* or whatever fixed width you want */
-  box-sizing: border-box; /* ensures padding/border is inside this size */
+  width: 389px;       /* fixed width */
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* vertical centering */
+  justify-content: center;
   gap: 12px;
 }
 
@@ -74,8 +74,8 @@ html, body {
 #zoomReminder {
   top: calc(20px + 60px + 186px + 2 * var(--panel-gap));
   right: 20px;
-  white-space: normal;   /* allow text to wrap */
-  overflow-wrap: break-word; /* force breaks on long words if needed */
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 /* Menu buttons */
@@ -145,16 +145,16 @@ html, body {
 <!-- Viewer container -->
 <div id="viewer-container">
   <iframe id="viewer"
-    src="https://3dviewer.net/embed.html#model=https://abhiraajr.github.io/testing/tinker.obj$camera=0,0,200,0,0,0,0,1,0,30$backgroundcolor=0,0,0,255$defaultcolor=200,200,200"
+    src="./tinker.obj"
     style="width:100%; height:100%; border:none;">
   </iframe>
 </div>
 
 <!-- Top-right menu -->
 <div id="menu" class="panel">
-  <button class="menu-button" data-model="https://abhiraajr.github.io/testing/tinker.obj">tinker.obj</button>
-  <button class="menu-button" data-model="https://abhiraajr.github.io/testing/placeholder1.obj">placeholder1.obj</button>
-  <button class="menu-button" data-model="https://abhiraajr.github.io/testing/placeholder2.obj">placeholder2.obj</button>
+  <button class="menu-button" data-model="sample.obj">sample.obj</button>
+  <button class="menu-button" data-model="sample2.obj">sample2.obj</button>
+  <button class="menu-button" data-model="sample3.obj">sample3.obj</button>
 </div>
 
 <!-- Controls panel -->
@@ -181,6 +181,9 @@ const buttons = document.querySelectorAll('.menu-button');
 const viewerContainer = document.getElementById('viewer-container');
 const loading = document.getElementById('loading');
 
+// Base URL for models (current folder)
+const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+
 // Convert hex to RGB
 function hexToRgb(hex) {
   const bigint = parseInt(hex.slice(1),16);
@@ -188,10 +191,15 @@ function hexToRgb(hex) {
 }
 
 // Load iframe
-function loadIframe(url) {
+function loadIframe(modelPath) {
   loading.style.display = 'block';
   const oldIframe = document.getElementById('viewer');
   if(oldIframe) oldIframe.remove();
+
+  const bg = hexToRgb(document.getElementById('bgColor').value);
+  const obj = hexToRgb(document.getElementById('defaultColor').value);
+
+  const url = `https://3dviewer.net/embed.html#model=${baseUrl}${modelPath}$camera=0,0,200,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
 
   const iframe = document.createElement('iframe');
   iframe.id = 'viewer';
@@ -203,25 +211,21 @@ function loadIframe(url) {
   viewerContainer.appendChild(iframe);
 }
 
+// Load default model on page load
+loadIframe('tinker.obj');
+
 // Menu buttons
 buttons.forEach(btn => {
   btn.addEventListener('click', () => {
-    const modelUrl = btn.dataset.model;
-    const bg = hexToRgb(document.getElementById('bgColor').value);
-    const obj = hexToRgb(document.getElementById('defaultColor').value);
-    const url = `https://3dviewer.net/embed.html#model=${modelUrl}$camera=0,0,200,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
-    loadIframe(url);
+    loadIframe(btn.dataset.model);
   });
 });
 
 // Apply settings button
 document.getElementById('applySettings').addEventListener('click', () => {
   const viewer = document.getElementById('viewer');
-  const currentModel = viewer ? viewer.src.split('#model=')[1].split('$')[0] : buttons[0].dataset.model;
-  const bg = hexToRgb(document.getElementById('bgColor').value);
-  const obj = hexToRgb(document.getElementById('defaultColor').value);
-  const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=0,0,200,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
-  loadIframe(url);
+  const currentModel = viewer ? viewer.src.split('#model=')[1].split('$')[0].replace(baseUrl, '') : buttons[0].dataset.model;
+  loadIframe(currentModel);
 });
 </script>
 
