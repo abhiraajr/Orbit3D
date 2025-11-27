@@ -32,7 +32,7 @@ html, body {
   width: 60px;
   height: 60px;
   border: 6px solid rgba(255,255,255,0.2);
-  border-top-color: #1565c0;
+  border-top-color: #0d47a1;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: none;
@@ -47,17 +47,17 @@ html, body {
   display: flex;
   gap: 15px;
   padding: 10px 20px;
-  background: rgba(21,101,192,0.3);
-  backdrop-filter: blur(12px);
+  background: rgba(10, 50, 90, 0.35);
+  backdrop-filter: blur(15px) saturate(180%);
   border-radius: 15px;
-  border: 1px solid rgba(21,101,192,0.6);
+  border: 1px solid rgba(30, 80, 140,0.6);
   z-index: 10;
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 
 /* Menu buttons */
 .menu-button {
-  background: rgba(21,101,192,0.5);
+  background: rgba(15,70,120,0.6);
   color: #fff;
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 10px;
@@ -68,7 +68,7 @@ html, body {
 }
 .menu-button:hover {
   transform: translateY(-3px);
-  background: rgba(21,101,192,0.7);
+  background: rgba(15,70,120,0.8);
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
@@ -82,10 +82,10 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: rgba(38,50,56,0.35);
-  backdrop-filter: blur(12px);
+  background: rgba(20,30,40,0.35);
+  backdrop-filter: blur(15px) saturate(180%);
   border-radius: 15px;
-  border: 1px solid rgba(21,101,192,0.6);
+  border: 1px solid rgba(10,50,90,0.6);
   z-index: 10;
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   color: #fff;
@@ -108,7 +108,7 @@ html, body {
   cursor: pointer;
 }
 #applySettings {
-  background: rgba(21,101,192,0.5);
+  background: rgba(15,70,120,0.6);
   color: #fff;
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 10px;
@@ -117,8 +117,26 @@ html, body {
   transition: background 0.2s, transform 0.2s;
 }
 #applySettings:hover {
-  background: rgba(21,101,192,0.7);
+  background: rgba(15,70,120,0.8);
   transform: translateY(-2px);
+}
+
+/* Zoom reminder panel */
+#zoomReminder {
+  position: absolute;
+  top: 300px; /* under controls panel */
+  right: 20px;
+  width: 280px;
+  padding: 12px 16px;
+  background: rgba(10,50,90,0.4);
+  backdrop-filter: blur(15px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(30,80,140,0.6);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+  color: #fff;
+  font-size: 0.85em;
+  z-index: 10;
+  line-height: 1.4em;
 }
 </style>
 </head>
@@ -155,27 +173,26 @@ html, body {
   <button id="applySettings">Apply Settings</button>
 </div>
 
+<!-- Zoom reminder panel -->
+<div id="zoomReminder">
+  Tip: Use your mouse scroll or touchpad to zoom out and adjust the 3D view.
+</div>
+
 <script>
 // Elements
 const buttons = document.querySelectorAll('.menu-button');
 const viewerContainer = document.getElementById('viewer-container');
 const loading = document.getElementById('loading');
 
-// Hex to RGB helper
+// Helper: hex to RGB
 function hexToRgb(hex) {
   const bigint = parseInt(hex.slice(1),16);
   return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
 }
 
-// Show zoom reminder
-function showZoomPopup() {
-  alert("Tip: Use your mouse scroll or touchpad to zoom out and adjust the view!");
-}
-
 // Function to fully reload iframe
 function loadIframe(url) {
   loading.style.display = 'block';
-  showZoomPopup(); // popup on reload
   const oldIframe = document.getElementById('viewer');
   if(oldIframe) oldIframe.remove();
 
@@ -209,9 +226,6 @@ document.getElementById('applySettings').addEventListener('click', () => {
   const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
   loadIframe(url);
 });
-
-// Show zoom popup on initial load
-window.addEventListener('load', showZoomPopup);
 </script>
 
 </body>
