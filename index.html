@@ -37,19 +37,17 @@ html, body {
   animation: spin 1s linear infinite;
   display: none;
 }
-@keyframes spin {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
-}
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
-/* Top menu panel */
+/* Top-right menu panel */
 #menu {
   position: absolute;
   top: 20px;
   right: 20px;
   display: flex;
-  gap: 15px;
+  gap: 10px;
   padding: 10px 20px;
-  background: rgba(21,101,192,0.3);
+  background: rgba(21,101,192,0.4);
   backdrop-filter: blur(12px);
   border-radius: 15px;
   border: 1px solid rgba(21,101,192,0.6);
@@ -69,7 +67,7 @@ html, body {
   transition: transform 0.2s, background 0.2s;
 }
 .menu-button:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   background: rgba(21,101,192,0.7);
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
@@ -84,7 +82,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: rgba(38,50,56,0.35);
+  background: rgba(38,50,56,0.4);
   backdrop-filter: blur(12px);
   border-radius: 15px;
   border: 1px solid rgba(21,101,192,0.6);
@@ -105,7 +103,10 @@ html, body {
 .control-group input[type=color], .control-group input[type=range] {
   width: 100%;
   cursor: pointer;
+  border-radius: 5px;
 }
+
+/* Apply button */
 #applySettings {
   background: rgba(21,101,192,0.5);
   color: #fff;
@@ -113,7 +114,7 @@ html, body {
   border-radius: 10px;
   padding: 8px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition: transform 0.2s, background 0.2s;
 }
 #applySettings:hover {
   background: rgba(21,101,192,0.7);
@@ -128,7 +129,9 @@ html, body {
 
 <!-- Viewer container -->
 <div id="viewer-container">
-  <iframe id="viewer"></iframe>
+  <iframe id="viewer"
+    src="https://3dviewer.net/embed.html#model=https://abhiraajr.github.io/testing/tinker.obj$camera=0,0,15,0,0,0,0,1,0,150$backgroundcolor=255,255,255,255$defaultcolor=200,200,200">
+  </iframe>
 </div>
 
 <!-- Top-right menu -->
@@ -150,7 +153,7 @@ html, body {
   </div>
   <div class="control-group">
     <label for="fovSlider">FOV: <span id="fovValue">150</span></label>
-    <input type="range" id="fovSlider" min="30" max="300" value="150">
+    <input type="range" id="fovSlider" min="30" max="150" value="150">
   </div>
   <button id="applySettings">Apply Settings</button>
 </div>
@@ -163,16 +166,13 @@ const loading = document.getElementById('loading');
 const fovSlider = document.getElementById('fovSlider');
 const fovValue = document.getElementById('fovValue');
 
-// Update FOV label
-fovSlider.addEventListener('input', () => fovValue.textContent = fovSlider.value);
-
-// Helper: hex to RGB
+// Convert hex color to RGB
 function hexToRgb(hex) {
   const bigint = parseInt(hex.slice(1),16);
   return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
 }
 
-// Create/reload iframe
+// Fully reload iframe with new URL
 function loadIframe(url) {
   loading.style.display = 'block';
   const oldIframe = document.getElementById('viewer');
@@ -184,34 +184,39 @@ function loadIframe(url) {
   iframe.style.width = '100%';
   iframe.style.height = '100%';
   iframe.style.border = 'none';
-  iframe.addEventListener('load', () => loading.style.display = 'none');
+  iframe.addEventListener('load', () => { loading.style.display = 'none'; });
   viewerContainer.appendChild(iframe);
 }
 
-// Generate URL for current settings
-function getCurrentViewerURL(model) {
+// Update FOV label
+fovSlider.addEventListener('input', () => { fovValue.textContent = fovSlider.value; });
+
+// Build viewer URL
+function buildUrl(modelUrl) {
   const bg = hexToRgb(document.getElementById('bgColor').value);
   const obj = hexToRgb(document.getElementById('defaultColor').value);
   const fov = fovSlider.value;
-  // Keep camera position standard, only adjust FOV
-  return `https://3dviewer.net/embed.html#model=${model}$camera=0,0,15,0,0,0,0,1,0,${fov}$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
+  return `https://3dviewer.net/embed.html#model=${modelUrl}$camera=0,0,15,0,0,0,0,1,0,${fov}$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
 }
 
-// Initial load
-loadIframe(getCurrentViewerURL(buttons[0].dataset.model));
-
-// Menu buttons switch models
+// Menu buttons
 buttons.forEach(btn => {
   btn.addEventListener('click', () => {
-    loadIframe(getCurrentViewerURL(btn.dataset.model));
+    const url = buildUrl(btn.dataset.model);
+    loadIframe(url);
   });
 });
 
 // Apply settings button
 document.getElementById('applySettings').addEventListener('click', () => {
-  const viewer = document.getElementById('viewer');
-  const currentModel = viewer ? viewer.src.split('#model=')[1].split('$')[0] : buttons[0].dataset.model;
-  loadIframe(getCurrentViewerURL(currentModel));
+  const currentIframe = document.getElementById('viewer');
+  let currentModel = buttons[0].dataset.model;
+  if(currentIframe) {
+    const match = currentIframe.src.match(/#model=(.*?)\$camera/);
+    if(match) currentModel = match[1];
+  }
+  const url = buildUrl(currentModel);
+  loadIframe(url);
 });
 </script>
 
