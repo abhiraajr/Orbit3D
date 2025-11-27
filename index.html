@@ -37,9 +37,7 @@ html, body {
   animation: spin 1s linear infinite;
   display: none;
 }
-@keyframes spin {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
-}
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
 /* Top menu panel */
 #menu {
@@ -132,7 +130,8 @@ html, body {
 <!-- Viewer container -->
 <div id="viewer-container">
   <iframe id="viewer"
-    src="https://3dviewer.net/embed.html#model=https://abhiraajr.github.io/testing/tinker.obj$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=255,255,255,255$defaultcolor=200,200,200">
+    src="https://3dviewer.net/embed.html#model=https://abhiraajr.github.io/testing/tinker.obj$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=255,255,255,255$defaultcolor=200,200,200"
+    style="width:100%; height:100%; border:none;">
   </iframe>
 </div>
 
@@ -162,30 +161,35 @@ const buttons = document.querySelectorAll('.menu-button');
 const viewerContainer = document.getElementById('viewer-container');
 const loading = document.getElementById('loading');
 
-// Helper: hex to RGB
+// Hex to RGB helper
 function hexToRgb(hex) {
   const bigint = parseInt(hex.slice(1),16);
   return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
 }
 
+// Show zoom reminder
+function showZoomPopup() {
+  alert("Tip: Use your mouse scroll or touchpad to zoom out and adjust the view!");
+}
+
 // Function to fully reload iframe
 function loadIframe(url) {
   loading.style.display = 'block';
-  // Remove old iframe
+  showZoomPopup(); // popup on reload
   const oldIframe = document.getElementById('viewer');
   if(oldIframe) oldIframe.remove();
 
-  // Create new iframe
   const iframe = document.createElement('iframe');
   iframe.id = 'viewer';
   iframe.src = url;
-  iframe.addEventListener('load', () => {
-    loading.style.display = 'none';
-  });
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.border = 'none';
+  iframe.addEventListener('load', () => { loading.style.display = 'none'; });
   viewerContainer.appendChild(iframe);
 }
 
-// Menu buttons switch models
+// Menu buttons
 buttons.forEach(btn => {
   btn.addEventListener('click', () => {
     const modelUrl = btn.dataset.model;
@@ -205,6 +209,9 @@ document.getElementById('applySettings').addEventListener('click', () => {
   const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
   loadIframe(url);
 });
+
+// Show zoom popup on initial load
+window.addEventListener('load', showZoomPopup);
 </script>
 
 </body>
