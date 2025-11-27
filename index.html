@@ -109,6 +109,9 @@ html, body {
   border-radius: 5px;
   cursor: pointer;
 }
+.control-group input[type=range] {
+  width: 100%;
+}
 #applySettings {
   background: rgba(21,101,192,0.5);
   color: #fff;
@@ -132,7 +135,7 @@ html, body {
 <!-- Viewer container -->
 <div id="viewer-container">
   <iframe id="viewer"
-    src="https://3dviewer.net/embed.html#model=https://abhiraajr.github.io/testing/tinker.obj$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=255,255,255,255$defaultcolor=200,200,200">
+    src="https://3dviewer.net/embed.html#model=https://abhiraajr.github.io/testing/tinker.obj$camera=0,0,15,0,0,0,0,1,0,45$backgroundcolor=255,255,255,255$defaultcolor=200,200,200">
   </iframe>
 </div>
 
@@ -153,6 +156,10 @@ html, body {
     <label for="defaultColor">Default Object Color</label>
     <input type="color" id="defaultColor" value="#c8c8c8">
   </div>
+  <div class="control-group">
+    <label for="fovSlider">FOV: <span id="fovValue">45</span></label>
+    <input type="range" id="fovSlider" min="30" max="90" value="45">
+  </div>
   <button id="applySettings">Apply Settings</button>
 </div>
 
@@ -161,6 +168,11 @@ html, body {
 const buttons = document.querySelectorAll('.menu-button');
 const viewerContainer = document.getElementById('viewer-container');
 const loading = document.getElementById('loading');
+const fovSlider = document.getElementById('fovSlider');
+const fovValue = document.getElementById('fovValue');
+
+// Update FOV label
+fovSlider.addEventListener('input', () => fovValue.textContent = fovSlider.value);
 
 // Helper: hex to RGB
 function hexToRgb(hex) {
@@ -168,31 +180,34 @@ function hexToRgb(hex) {
   return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
 }
 
-// Function to fully reload iframe
+// Create/reload iframe
 function loadIframe(url) {
   loading.style.display = 'block';
-  // Remove old iframe
   const oldIframe = document.getElementById('viewer');
   if(oldIframe) oldIframe.remove();
 
-  // Create new iframe
   const iframe = document.createElement('iframe');
   iframe.id = 'viewer';
   iframe.src = url;
-  iframe.addEventListener('load', () => {
-    loading.style.display = 'none';
-  });
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.border = 'none';
+  iframe.addEventListener('load', () => loading.style.display = 'none');
   viewerContainer.appendChild(iframe);
+}
+
+// Generate URL for current settings
+function getCurrentViewerURL(model) {
+  const bg = hexToRgb(document.getElementById('bgColor').value);
+  const obj = hexToRgb(document.getElementById('defaultColor').value);
+  const fov = fovSlider.value;
+  return `https://3dviewer.net/embed.html#model=${model}$camera=0,0,15,0,0,0,0,1,0,${fov}$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
 }
 
 // Menu buttons switch models
 buttons.forEach(btn => {
   btn.addEventListener('click', () => {
-    const modelUrl = btn.dataset.model;
-    const bg = hexToRgb(document.getElementById('bgColor').value);
-    const obj = hexToRgb(document.getElementById('defaultColor').value);
-    const url = `https://3dviewer.net/embed.html#model=${modelUrl}$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
-    loadIframe(url);
+    loadIframe(getCurrentViewerURL(btn.dataset.model));
   });
 });
 
@@ -200,10 +215,7 @@ buttons.forEach(btn => {
 document.getElementById('applySettings').addEventListener('click', () => {
   const viewer = document.getElementById('viewer');
   const currentModel = viewer ? viewer.src.split('#model=')[1].split('$')[0] : buttons[0].dataset.model;
-  const bg = hexToRgb(document.getElementById('bgColor').value);
-  const obj = hexToRgb(document.getElementById('defaultColor').value);
-  const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
-  loadIframe(url);
+  loadIframe(getCurrentViewerURL(currentModel));
 });
 </script>
 
