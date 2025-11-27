@@ -116,5 +116,5 @@ main (branch)
 
 ## 🎨 Credits
 
-- **Project Author:** me (GitHub: `me`)  
+- **Project Author:** me (GitHub: `abhiraajr`)  
 - **3D Rendering Engine:** [3DViewer.net](https://3dviewer.net)
