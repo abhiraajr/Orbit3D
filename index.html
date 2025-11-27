@@ -69,18 +69,17 @@ html, body {
 #menu {
   top: 20px;
   right: 20px;
-
+  justify-content: flex-start !important;
+  align-items: center !important;
+  padding-left: 0 !important;
   display: flex;
   flex-direction: row;
   gap: 10px;
-
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
   scroll-behavior: smooth;
-
   scrollbar-width: none;        /* Firefox */
-  
   padding-left: -50px;
 }
 #menu::-webkit-scrollbar {
@@ -164,10 +163,7 @@ html, body {
 
 <!-- Viewer container -->
 <div id="viewer-container">
-  <iframe id="viewer"
-    src="20mm_cube.stl"
-    style="width:100%; height:100%; border:none;">
-  </iframe>
+  <iframe id="viewer" style="width:100%; height:100%; border:none;"></iframe>
 </div>
 
 <!-- Top-right menu -->
@@ -240,7 +236,7 @@ function loadIframe(modelPath) {
 }
 
 // Load default model on page load
-loadIframe('tinker.obj');
+loadIframe('20mm_cube.stl');
 
 // Menu buttons
 buttons.forEach(btn => {
