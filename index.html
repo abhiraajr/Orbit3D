@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>3D Viewer Control Panel</title>
+<title>3D Viewer with Controls</title>
 <style>
 html, body {
   margin: 0;
@@ -12,7 +12,7 @@ html, body {
   background: #111;
 }
 
-/* Fullscreen iframe viewer */
+/* Fullscreen viewer container */
 #viewer-container {
   position: absolute;
   top: 0;
@@ -20,11 +20,6 @@ html, body {
   width: 100%;
   height: 100%;
   z-index: 0;
-}
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
 }
 
 /* Loading spinner */
@@ -37,12 +32,11 @@ iframe {
   width: 60px;
   height: 60px;
   border: 6px solid rgba(255,255,255,0.2);
-  border-top-color: #2196f3;
+  border-top-color: #1565c0;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: none;
 }
-
 @keyframes spin {
   to { transform: translate(-50%, -50%) rotate(360deg); }
 }
@@ -55,19 +49,19 @@ iframe {
   display: flex;
   gap: 15px;
   padding: 10px 20px;
-  background: rgba(33, 150, 243, 0.25);
+  background: rgba(21,101,192,0.3);
   backdrop-filter: blur(12px);
   border-radius: 15px;
-  border: 1px solid rgba(33,150,243,0.5);
+  border: 1px solid rgba(21,101,192,0.6);
   z-index: 10;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 
 /* Menu buttons */
 .menu-button {
-  background: rgba(33,150,243,0.4);
+  background: rgba(21,101,192,0.5);
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
   border-radius: 10px;
   padding: 8px 14px;
   font-size: 0.9em;
@@ -76,8 +70,8 @@ iframe {
 }
 .menu-button:hover {
   transform: translateY(-3px);
-  background: rgba(33,150,243,0.6);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  background: rgba(21,101,192,0.7);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
 /* Controls panel */
@@ -90,12 +84,12 @@ iframe {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: rgba(38,50,56,0.25);
+  background: rgba(38,50,56,0.35);
   backdrop-filter: blur(12px);
   border-radius: 15px;
-  border: 1px solid rgba(33,150,243,0.5);
+  border: 1px solid rgba(21,101,192,0.6);
   z-index: 10;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   color: #fff;
   font-size: 0.85em;
 }
@@ -108,15 +102,25 @@ iframe {
 .control-group label {
   margin-bottom: 4px;
 }
-.control-group input[type=range] {
-  width: 100%;
-}
 .control-group input[type=color] {
   width: 100%;
   height: 30px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+#applySettings {
+  background: rgba(21,101,192,0.5);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+#applySettings:hover {
+  background: rgba(21,101,192,0.7);
+  transform: translateY(-2px);
 }
 </style>
 </head>
@@ -125,7 +129,7 @@ iframe {
 <!-- Loading spinner -->
 <div id="loading"></div>
 
-<!-- Fullscreen viewer -->
+<!-- Viewer container -->
 <div id="viewer-container">
   <iframe id="viewer"
     src="https://3dviewer.net/embed.html#model=https://abhiraajr.github.io/testing/tinker.obj$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=255,255,255,255$defaultcolor=200,200,200">
@@ -139,20 +143,8 @@ iframe {
   <button class="menu-button" data-model="https://abhiraajr.github.io/testing/placeholder2.obj">placeholder2.obj</button>
 </div>
 
-<!-- Right-side controls -->
+<!-- Controls panel -->
 <div id="controls">
-  <div class="control-group">
-    <label for="cameraX">Camera X</label>
-    <input type="range" id="cameraX" min="-20" max="20" step="0.1" value="0">
-  </div>
-  <div class="control-group">
-    <label for="cameraY">Camera Y</label>
-    <input type="range" id="cameraY" min="-20" max="20" step="0.1" value="0">
-  </div>
-  <div class="control-group">
-    <label for="cameraZ">Camera Z</label>
-    <input type="range" id="cameraZ" min="-50" max="50" step="0.1" value="5">
-  </div>
   <div class="control-group">
     <label for="bgColor">Background Color</label>
     <input type="color" id="bgColor" value="#ffffff">
@@ -161,63 +153,57 @@ iframe {
     <label for="defaultColor">Default Object Color</label>
     <input type="color" id="defaultColor" value="#c8c8c8">
   </div>
-  <button id="applySettings" class="menu-button">Apply Settings</button>
+  <button id="applySettings">Apply Settings</button>
 </div>
 
 <script>
 // Elements
 const buttons = document.querySelectorAll('.menu-button');
-const viewer = document.getElementById('viewer');
+const viewerContainer = document.getElementById('viewer-container');
 const loading = document.getElementById('loading');
 
-// Show loading spinner while iframe is loading
-viewer.addEventListener('load', () => {
-  loading.style.display = 'none';
-});
-
-// Function to refresh iframe
-function refreshIframe(url) {
-  loading.style.display = 'block';
-  viewer.src = url;
-}
-
-// Update viewer with settings
-function updateViewer({model, camera, backgroundcolor, defaultcolor}) {
-  const currentModel = model || buttons[0].dataset.model;
-  const cam = camera || "0,0,5,0,0,0,0,1,0,45";
-  const bg = backgroundcolor || "255,255,255,255";
-  const def = defaultcolor || "200,200,200";
-
-  const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=${cam}$backgroundcolor=${bg}$defaultcolor=${def}`;
-  refreshIframe(url);
-}
-
-// Hex to RGB
+// Helper: hex to RGB
 function hexToRgb(hex) {
   const bigint = parseInt(hex.slice(1),16);
   return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
 }
 
-// Top menu model switch
+// Function to fully reload iframe
+function loadIframe(url) {
+  loading.style.display = 'block';
+  // Remove old iframe
+  const oldIframe = document.getElementById('viewer');
+  if(oldIframe) oldIframe.remove();
+
+  // Create new iframe
+  const iframe = document.createElement('iframe');
+  iframe.id = 'viewer';
+  iframe.src = url;
+  iframe.addEventListener('load', () => {
+    loading.style.display = 'none';
+  });
+  viewerContainer.appendChild(iframe);
+}
+
+// Menu buttons switch models
 buttons.forEach(btn => {
   btn.addEventListener('click', () => {
-    updateViewer({model: btn.dataset.model});
+    const modelUrl = btn.dataset.model;
+    const bg = hexToRgb(document.getElementById('bgColor').value);
+    const obj = hexToRgb(document.getElementById('defaultColor').value);
+    const url = `https://3dviewer.net/embed.html#model=${modelUrl}$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
+    loadIframe(url);
   });
 });
 
-// Apply settings
+// Apply settings button
 document.getElementById('applySettings').addEventListener('click', () => {
-  const camX = document.getElementById('cameraX').value;
-  const camY = document.getElementById('cameraY').value;
-  const camZ = document.getElementById('cameraZ').value;
+  const viewer = document.getElementById('viewer');
+  const currentModel = viewer ? viewer.src.split('#model=')[1].split('$')[0] : buttons[0].dataset.model;
   const bg = hexToRgb(document.getElementById('bgColor').value);
   const obj = hexToRgb(document.getElementById('defaultColor').value);
-
-  updateViewer({
-    camera: `${camX},${camY},${camZ},0,0,0,0,1,0,45`,
-    backgroundcolor: `${bg.r},${bg.g},${bg.b},255`,
-    defaultcolor: `${obj.r},${obj.g},${obj.b}`
-  });
+  const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
+  loadIframe(url);
 });
 </script>
 
