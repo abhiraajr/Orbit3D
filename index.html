@@ -65,13 +65,13 @@ html, body {
   gap: 12px;
 }
 
-/* Panel stacking with uniform gap */
-#menu {
+/* Menu panel */
+#menu.panel {
   position: absolute;
   top: 20px;
   right: 20px;
 
-  /* OVERRIDE all inherited panel styles */
+  /* override panel defaults */
   padding: 0 !important;
   margin: 0 !important;
   width: auto !important;
@@ -79,27 +79,33 @@ html, body {
   border: 2px solid var(--border-color);
   background: #000;
 
-  /* Layout */
-  display: flex;
-  flex-direction: row;
+  /* horizontal row */
+  display: flex !important;
+  flex-direction: row !important;
   align-items: center;
   justify-content: flex-start;
 
-  gap: 12px;            /* spacing between buttons */
-  padding-left: 12px;   /* spacing from left border */
-  padding-right: 12px;  /* spacing from right border */
-  height: 60px;         /* clean consistent bar height */
+  gap: 10px;
 
-  /* Scrolling */
+  /* ensure visible gap inside the bar */
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  height: 60px; /* consistent bar height */
+  box-sizing: border-box;
+
+  /* horizontal scrolling */
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
+  scroll-behavior: smooth;
   scrollbar-width: none;
+
+  width: 389px !important;
 }
 
-#menu::-webkit-scrollbar {
-  display: none;
-}
+/* hide scrollbar */
+#menu.panel::-webkit-scrollbar { display: none; }
+
 #controls {
   top: calc(20px + 60px + var(--panel-gap));
   right: 20px;
@@ -213,8 +219,8 @@ html, body {
 <div id="menu" class="panel">
   <button class="menu-button" data-model="20mm_cube.stl">20mm_cube.stl</button>
   <button class="menu-button" data-model="airplane.obj">airplane.obj</button>
-  <button class="menu-button" data-model="alienspaceship.glb">alienspaceship.glb</button>
   <button class="menu-button" data-model="floatplane.obj">floatplane.obj</button>
+  <button class="menu-button" data-model="alienspaceship.glb">alienspaceship.glb</button>
 </div>
 
 <!-- Controls panel -->
