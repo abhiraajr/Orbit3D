@@ -209,7 +209,7 @@ buttons.forEach(btn => {
     const modelUrl = btn.dataset.model;
     const bg = hexToRgb(document.getElementById('bgColor').value);
     const obj = hexToRgb(document.getElementById('defaultColor').value);
-    const url = `https://3dviewer.net/embed.html#model=${modelUrl}$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
+    const url = `https://3dviewer.net/embed.html#model=${modelUrl}$camera=0,0,200,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
     loadIframe(url);
   });
 });
@@ -220,7 +220,7 @@ document.getElementById('applySettings').addEventListener('click', () => {
   const currentModel = viewer ? viewer.src.split('#model=')[1].split('$')[0] : buttons[0].dataset.model;
   const bg = hexToRgb(document.getElementById('bgColor').value);
   const obj = hexToRgb(document.getElementById('defaultColor').value);
-  const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=0,0,5,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
+  const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=0,0,200,0,0,0,0,1,0,45$backgroundcolor=${bg.r},${bg.g},${bg.b},255$defaultcolor=${obj.r},${obj.g},${obj.b}&t=${Date.now()}`;
   loadIframe(url);
 });
 </script>
