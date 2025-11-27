@@ -27,7 +27,27 @@ iframe {
   border: none;
 }
 
-/* Top menu panel for selecting models */
+/* Loading spinner */
+#loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  width: 60px;
+  height: 60px;
+  border: 6px solid rgba(255,255,255,0.2);
+  border-top-color: #2196f3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Top menu panel */
 #menu {
   position: absolute;
   top: 20px;
@@ -35,7 +55,7 @@ iframe {
   display: flex;
   gap: 15px;
   padding: 10px 20px;
-  background: rgba(33, 150, 243, 0.25); /* 3dviewer.net blue-ish */
+  background: rgba(33, 150, 243, 0.25);
   backdrop-filter: blur(12px);
   border-radius: 15px;
   border: 1px solid rgba(33,150,243,0.5);
@@ -43,7 +63,7 @@ iframe {
   box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 
-/* Buttons in top menu */
+/* Menu buttons */
 .menu-button {
   background: rgba(33,150,243,0.4);
   color: #fff;
@@ -60,7 +80,7 @@ iframe {
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* Second panel for controls */
+/* Controls panel */
 #controls {
   position: absolute;
   top: 80px;
@@ -70,7 +90,7 @@ iframe {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: rgba(38,50,56,0.25); /* dark gray theme */
+  background: rgba(38,50,56,0.25);
   backdrop-filter: blur(12px);
   border-radius: 15px;
   border: 1px solid rgba(33,150,243,0.5);
@@ -80,7 +100,7 @@ iframe {
   font-size: 0.85em;
 }
 
-/* Controls */
+/* Control inputs */
 .control-group {
   display: flex;
   flex-direction: column;
@@ -102,6 +122,9 @@ iframe {
 </head>
 <body>
 
+<!-- Loading spinner -->
+<div id="loading"></div>
+
 <!-- Fullscreen viewer -->
 <div id="viewer-container">
   <iframe id="viewer"
@@ -116,7 +139,7 @@ iframe {
   <button class="menu-button" data-model="https://abhiraajr.github.io/testing/placeholder2.obj">placeholder2.obj</button>
 </div>
 
-<!-- Right-side control panel -->
+<!-- Right-side controls -->
 <div id="controls">
   <div class="control-group">
     <label for="cameraX">Camera X</label>
@@ -142,50 +165,60 @@ iframe {
 </div>
 
 <script>
-// Model switching
+// Elements
 const buttons = document.querySelectorAll('.menu-button');
 const viewer = document.getElementById('viewer');
+const loading = document.getElementById('loading');
 
-buttons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const url = btn.dataset.model;
-    updateViewer({model: url});
-  });
+// Show loading spinner while iframe is loading
+viewer.addEventListener('load', () => {
+  loading.style.display = 'none';
 });
 
-// Apply controls
-document.getElementById('applySettings').addEventListener('click', () => {
-  const camX = document.getElementById('cameraX').value;
-  const camY = document.getElementById('cameraY').value;
-  const camZ = document.getElementById('cameraZ').value;
-  const bg = document.getElementById('bgColor').value;
-  const obj = document.getElementById('defaultColor').value;
-
-  const bgRGB = hexToRgb(bg);
-  const objRGB = hexToRgb(obj);
-
-  updateViewer({
-    camera: `${camX},${camY},${camZ},0,0,0,0,1,0,45`,
-    backgroundcolor: `${bgRGB.r},${bgRGB.g},${bgRGB.b},255`,
-    defaultcolor: `${objRGB.r},${objRGB.g},${objRGB.b}`
-  });
-});
-
-// Helper: convert hex to rgb
-function hexToRgb(hex) {
-  const bigint = parseInt(hex.slice(1),16);
-  return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
+// Function to refresh iframe
+function refreshIframe(url) {
+  loading.style.display = 'block';
+  viewer.src = url;
 }
 
-// Update iframe URL
+// Update viewer with settings
 function updateViewer({model, camera, backgroundcolor, defaultcolor}) {
   const currentModel = model || buttons[0].dataset.model;
   const cam = camera || "0,0,5,0,0,0,0,1,0,45";
   const bg = backgroundcolor || "255,255,255,255";
   const def = defaultcolor || "200,200,200";
 
-  viewer.src = `https://3dviewer.net/embed.html#model=${currentModel}$camera=${cam}$backgroundcolor=${bg}$defaultcolor=${def}`;
+  const url = `https://3dviewer.net/embed.html#model=${currentModel}$camera=${cam}$backgroundcolor=${bg}$defaultcolor=${def}`;
+  refreshIframe(url);
 }
+
+// Hex to RGB
+function hexToRgb(hex) {
+  const bigint = parseInt(hex.slice(1),16);
+  return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
+}
+
+// Top menu model switch
+buttons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    updateViewer({model: btn.dataset.model});
+  });
+});
+
+// Apply settings
+document.getElementById('applySettings').addEventListener('click', () => {
+  const camX = document.getElementById('cameraX').value;
+  const camY = document.getElementById('cameraY').value;
+  const camZ = document.getElementById('cameraZ').value;
+  const bg = hexToRgb(document.getElementById('bgColor').value);
+  const obj = hexToRgb(document.getElementById('defaultColor').value);
+
+  updateViewer({
+    camera: `${camX},${camY},${camZ},0,0,0,0,1,0,45`,
+    backgroundcolor: `${bg.r},${bg.g},${bg.b},255`,
+    defaultcolor: `${obj.r},${obj.g},${obj.b}`
+  });
+});
 </script>
 
 </body>
